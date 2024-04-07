@@ -1,0 +1,29 @@
+config:
+  target: "https://nameday.abalin.net"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+      name: "Faza ramp-up"
+  payload:
+    path: "dates.csv"
+    fields:
+      - "country"
+      - "timezone"
+scenarios:
+  - name: "NameDay API Test"
+    flow:
+      - get:
+          url: "/api/V1/today"
+      - post:
+          url: "/api/V1/tomorrow"
+          json:
+            country: "{{ country }}"
+            timezone: "{{ timezone }}"
+    ensure:
+      thresholds:
+        - http.response_time.p95 < 800
+        - http.response_time.median < 300
+        - http.errors < 1%
+
+
